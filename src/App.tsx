@@ -1,17 +1,26 @@
+// about react basic components
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+// about styled-components
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 
-import Layout from "./components/layout";
+// about Firebase
+import { auth } from "./firebase";
 
+// about components
+import Layout from "./components/layout";
+import LoadingScreen from "./components/loading-screen";
+
+// about routes
 import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
-import LoadingScreen from "./components/loading-screen";
 
+// code start
+// router setting
 const router = createBrowserRouter([
   {
     path: "/",
@@ -37,6 +46,7 @@ const router = createBrowserRouter([
   },
 ]);
 
+// default global style setting
 const GlobalStyles = createGlobalStyle`
   ${reset};
 
@@ -51,11 +61,14 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+// App fucntion start (page render)
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  // Firebase authentication process
   const init = async () => {
     // wait for firebase
-    setTimeout(() => setIsLoading(false), 2000);
+    await auth.authStateReady(); // 최초 인증상태가 완료될 때 실행되는 promise를 return -> 로그인 여부를 확인하는 과정
+    setIsLoading(false);
   };
 
   useEffect(() => {
