@@ -12,6 +12,7 @@ import { auth } from "./firebase";
 // about components
 import Layout from "./components/layout";
 import LoadingScreen from "./components/loading-screen";
+import ProtectedRoute from "./components/protected-route";
 
 // about routes
 import Home from "./routes/home";
@@ -24,7 +25,11 @@ import CreateAccount from "./routes/create-account";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "",
