@@ -1,4 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../firebase";
+
 import styled from "styled-components";
 
 const Wrapper = styled.div`
@@ -42,6 +47,7 @@ const Error = styled.span`
 `;
 
 function CreateAccount() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
@@ -62,11 +68,26 @@ function CreateAccount() {
     }
   };
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // 새로고침 방지
+
+    if (loading || name === "" || email === "" || password === "") {
+      return;
+    }
 
     try {
       // create an account
+      setLoading(true);
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(credentials.user);
+      await updateProfile(credentials.user, {
+        displayName: name,
+      });
+      navigate("/");
       // set the name of the user profile
       // redirect to the homepage
     } catch (error) {
@@ -80,7 +101,7 @@ function CreateAccount() {
 
   return (
     <Wrapper>
-      <Title>Log into twitter🕊️</Title>
+      <Title>Create Account 🕊️</Title>
       <Form onSubmit={onSubmit}>
         <Input
           onChange={onChange}
