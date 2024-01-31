@@ -1,50 +1,21 @@
+// about React
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
+// about Firebase
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
+import { FirebaseError } from "firebase/app";
 
-import styled from "styled-components";
-
-const Wrapper = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 420px;
-  padding: 50px 0px;
-`;
-
-const Title = styled.h1`
-  font-size: 42px;
-`;
-
-const Form = styled.form`
-  margin-top: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-`;
-
-const Input = styled.input`
-  padding: 10px 20px;
-  border-radius: 50px;
-  border: none;
-  width: 100%;
-  font-size: 16px;
-  &[type="submit"] {
-    cursor: pointer;
-    &:hover {
-      opacity: 0.9;
-    }
-  }
-`;
-
-const Error = styled.span`
-  font-weight: 600;
-  color: tomato;
-`;
+// about auth styled-components
+import {
+  Error,
+  Form,
+  Input,
+  Switcher,
+  Title,
+  Wrapper,
+} from "../components/auth-components";
 
 function CreateAccount() {
   const navigate = useNavigate();
@@ -70,6 +41,7 @@ function CreateAccount() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // 새로고침 방지
+    setError(""); // 사용자가 버튼을 다시 클릭했을 때, 오류메세지 초기화
 
     if (loading || name === "" || email === "" || password === "") {
       return;
@@ -83,7 +55,6 @@ function CreateAccount() {
         email,
         password
       );
-      console.log(credentials.user);
       await updateProfile(credentials.user, {
         displayName: name,
       });
@@ -92,11 +63,12 @@ function CreateAccount() {
       // redirect to the homepage
     } catch (error) {
       // setError
+      if (error instanceof FirebaseError) {
+        setError(error.message);
+      }
     } finally {
       setLoading(false);
     }
-
-    console.log(name, email, password);
   };
 
   return (
@@ -133,6 +105,9 @@ function CreateAccount() {
         />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
+      <Switcher>
+        이미 계정이 있으신가요? <Link to="/login">로그인</Link>
+      </Switcher>
     </Wrapper>
   );
 }
