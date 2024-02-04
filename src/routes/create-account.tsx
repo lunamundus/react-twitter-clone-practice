@@ -111,6 +111,9 @@ function CreateAccount() {
       <Switcher>
         이미 계정이 있으신가요? <Link to="/login">로그인</Link>
       </Switcher>
+      <Switcher>
+        비밀번호를 잊으셨나요? <Link to="/reset-password">암호 재설정</Link>
+      </Switcher>
       <GithubButton />
     </Wrapper>
   );
