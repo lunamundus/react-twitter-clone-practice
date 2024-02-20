@@ -1,18 +1,16 @@
-import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
+// about Styled Components
+import styled from "styled-components";
+
+// about Components
+import PostTweetForm from "../components/post-tweet-form";
+
+const Wrapper = styled.div``;
 
 function Home() {
-  const navigate = useNavigate();
-
-  const logOut = () => {
-    auth.signOut();
-    navigate("/login");
-  };
-
   return (
-    <div>
-      <button onClick={logOut}>로그아웃</button>
-    </div>
+    <Wrapper>
+      <PostTweetForm />
+    </Wrapper>
   );
 }
 
