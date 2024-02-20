@@ -2,11 +2,12 @@
 import { useState } from "react";
 
 // about Firebase
-import { addDoc, collection } from "firebase/firestore";
+import { auth, database, storage } from "../firebase";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 // about Styled Components
 import styled from "styled-components";
-import { auth, database } from "../firebase";
 
 const Form = styled.form`
   display: flex;
@@ -79,7 +80,11 @@ function PostTweetForm() {
     const { files } = event.target;
 
     if (files && files.length === 1) {
-      setFile(files[0]);
+      if (files[0].size > 1024 * 1024) {
+        alert("업로드 가능한 최대 용량은 1MB 입니다.");
+      } else {
+        setFile(files[0]);
+      }
     }
   };
 
@@ -95,12 +100,29 @@ function PostTweetForm() {
     try {
       setLoading(true);
 
-      await addDoc(collection(database, "tweets"), {
+      const doc = await addDoc(collection(database, "tweets"), {
         tweet,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });
+
+      if (file) {
+        const locationRef = ref(
+          storage,
+          `tweets/${user.uid}-${user.displayName}/${doc.id}`
+        );
+        const result = await uploadBytes(locationRef, file);
+
+        const url = await getDownloadURL(result.ref);
+
+        await updateDoc(doc, {
+          photo: url,
+        });
+
+        setTweet("");
+        setFile(null);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -116,6 +138,7 @@ function PostTweetForm() {
         onChange={onChange}
         value={tweet}
         placeholder="What is happening?!"
+        required
       />
       <AttachFileButton htmlFor="file">
         {file ? "Photo Added ✅" : "Add Photo"}
